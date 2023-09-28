@@ -466,7 +466,7 @@ class TimeUnit:
         
         # 这里是对年份表达的极好方式
         rule = (
-            r"[0-9]?[0-9]?[0-9]{2}-((10)|(11)|(12)|([1-9]))-((?<!\d))([0-3][0-9]|[1-9])"
+            r"[0-9]?[0-9]?[0-9]{2}-((10)|(11)|(12)|(0?[1-9]))-((?<!\d))([0-3][0-9]|[1-9])"
         )
         pattern: Pattern = re.compile(rule)
         match = pattern.search(self.exp_time)
@@ -479,7 +479,7 @@ class TimeUnit:
             return
 
         rule = (
-            r"[0-9]?[0-9]?[0-9]{2}/((10)|(11)|(12)|([1-9]))/((?<!\d))([0-3][0-9]|[1-9])"
+            r"[0-9]?[0-9]?[0-9]{2}/((10)|(11)|(12)|(0?[1-9]))/((?<!\d))([0-3][0-9]|[1-9])"
         )
         pattern: Pattern = re.compile(rule)
         match = pattern.search(self.exp_time)
@@ -492,7 +492,7 @@ class TimeUnit:
             return
 
         rule = (
-            r"((10)|(11)|(12)|([1-9]))/((?<!\d))([0-3][0-9]|[1-9])/[0-9]?[0-9]?[0-9]{2}"
+            r"((10)|(11)|(12)|(0?[1-9]))/((?<!\d))([0-3][0-9]|[1-9])/[0-9]?[0-9]?[0-9]{2}"
         )
         pattern: Pattern = re.compile(rule)
         match = pattern.search(self.exp_time)
@@ -504,7 +504,7 @@ class TimeUnit:
             self.tp.year = int(tmp_parser[2])
             return
 
-        rule = r"[0-9]?[0-9]?[0-9]{2}\.((10)|(11)|(12)|([1-9]))\.((?<!\d))([0-3][0-9]|[1-9])"
+        rule = r"[0-9]?[0-9]?[0-9]{2}\.((10)|(11)|(12)|(0?[1-9]))\.((?<!\d))([0-3][0-9]|[1-9])"
         pattern: Pattern = re.compile(rule)
         match = pattern.search(self.exp_time)
         if match is not None:

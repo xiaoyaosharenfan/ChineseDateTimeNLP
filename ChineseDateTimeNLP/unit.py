@@ -146,7 +146,7 @@ class TimeUnit:
         """
         月-规范化方法--该方法识别时间表达式单元的月字段
         """
-        rule = r"((10)|(11)|(12)|([1-9]))(?=月)"
+        rule = r"((10)|(11)|(12)|(0?[1-9]))(?=月)"
         pattern: Pattern = re.compile(rule)
         match = pattern.search(self.exp_time)
         if match is not None:
@@ -158,12 +158,12 @@ class TimeUnit:
         """
         月-日 兼容模糊写法：该方法识别时间表达式单元的月、日字段
         """
-        rule = r"((10)|(11)|(12)|([1-9]))(月|\.|\-)([0-3][0-9]|[1-9])"
+        rule = r"((10)|(11)|(12)|(0?[1-9]))(月|\.|-|/)([0-3][0-9]|[1-9])"
         pattern: Pattern = re.compile(rule)
         match = pattern.search(self.exp_time)
         if match is not None:
             matchStr = match.group()
-            p = re.compile(r"(月|\.|\-)")
+            p = re.compile(r"(月|\.|-|/)")
             m = p.search(matchStr)
             if m is not None:
                 splitIndex = m.start()
@@ -465,54 +465,38 @@ class TimeUnit:
                     self.isAllDayTime = False
         
         # 这里是对年份表达的极好方式
-        rule = (
-            r"[0-9]?[0-9]?[0-9]{2}-((10)|(11)|(12)|(0?[1-9]))-((?<!\d))([0-3][0-9]|[1-9])"
-        )
+        rule = r"[0-9]?[0-9]?[0-9]{2}(\.|-|/)((10)|(11)|(12)|(0?[1-9]))(\.|-|/)((?<!\d))([0-3][0-9]|[1-9])"
         pattern: Pattern = re.compile(rule)
         match = pattern.search(self.exp_time)
         if match is not None:
             tmp_target = match.group()
-            tmp_parser = tmp_target.split("-")
+            if "." in self.exp_time:
+                tmp_parser = tmp_target.split(".")
+            elif "-" in self.exp_time:
+                tmp_parser = tmp_target.split("-")
+            else:
+                tmp_parser = tmp_target.split("/")
             self.tp.year = int(tmp_parser[0])
             self.tp.month = int(tmp_parser[1])
             self.tp.day = int(tmp_parser[2])
             return
 
         rule = (
-            r"[0-9]?[0-9]?[0-9]{2}/((10)|(11)|(12)|(0?[1-9]))/((?<!\d))([0-3][0-9]|[1-9])"
+            r"((10)|(11)|(12)|(0?[1-9]))(\.|-|/)((?<!\d))([0-3][0-9]|[1-9])(\.|-|/)[0-9]?[0-9]?[0-9]{2}"
         )
         pattern: Pattern = re.compile(rule)
         match = pattern.search(self.exp_time)
         if match is not None:
             tmp_target = match.group()
-            tmp_parser = tmp_target.split("/")
-            self.tp.year = int(tmp_parser[0])
-            self.tp.month = int(tmp_parser[1])
-            self.tp.day = int(tmp_parser[2])
-            return
-
-        rule = (
-            r"((10)|(11)|(12)|(0?[1-9]))/((?<!\d))([0-3][0-9]|[1-9])/[0-9]?[0-9]?[0-9]{2}"
-        )
-        pattern: Pattern = re.compile(rule)
-        match = pattern.search(self.exp_time)
-        if match is not None:
-            tmp_target = match.group()
-            tmp_parser = tmp_target.split("/")
+            if "." in self.exp_time:
+                tmp_parser = tmp_target.split(".")
+            elif "-" in self.exp_time:
+                tmp_parser = tmp_target.split("-")
+            else:
+                tmp_parser = tmp_target.split("/")
             self.tp.month = int(tmp_parser[0])
             self.tp.day = int(tmp_parser[1])
             self.tp.year = int(tmp_parser[2])
-            return
-
-        rule = r"[0-9]?[0-9]?[0-9]{2}\.((10)|(11)|(12)|(0?[1-9]))\.((?<!\d))([0-3][0-9]|[1-9])"
-        pattern: Pattern = re.compile(rule)
-        match = pattern.search(self.exp_time)
-        if match is not None:
-            tmp_target = match.group()
-            tmp_parser = tmp_target.split(".")
-            self.tp.year = int(tmp_parser[0])
-            self.tp.month = int(tmp_parser[1])
-            self.tp.day = int(tmp_parser[2])
             return
 
     def norm_setBaseRelated(self):
@@ -1065,9 +1049,14 @@ class TimeUnit:
             self._noyear = False
         if cur_unit < self.tp.tunit[checkTimeIndex]:
             return
-        # if cur_unit == self.tp.tunit[checkTimeIndex]:
-        #     down_unit = int(time_arr[checkTimeIndex + 1])
-        #     if down_unit
+        if cur_unit == self.tp.tunit[checkTimeIndex]:
+            _is_same_time = True
+            for i in range(1, 6 - checkTimeIndex):
+                down_unit = time_arr[checkTimeIndex + i]
+                if self.tp.tunit[checkTimeIndex + i] != -1 and self.tp.tunit[checkTimeIndex + i] < down_unit:
+                    _is_same_time = False
+            if _is_same_time:
+                return
         # 准备增加的时间单位是被检查的时间的上一级，将上一级时间+1
         cur = self.addTime(cur, checkTimeIndex - 1)
         time_arr = arrow2tp(cur)

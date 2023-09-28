@@ -1,4 +1,4 @@
-name: ChineseTimeNLP pytest and lint
+name: ChineseDateTimeNLP pytest and lint
 
 on: [push]
 

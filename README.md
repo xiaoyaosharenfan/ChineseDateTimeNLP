@@ -1,19 +1,19 @@
-# ChineseTimeNLP
+# ChineseDateTimeNLP
 
-[![PyPI](https://img.shields.io/pypi/v/ChineseTimeNLP.svg)](https://pypi.python.org/pypi/ChineseTimeNLP)
+[![PyPI](https://img.shields.io/pypi/v/ChineseDateTimeNLP.svg)](https://pypi.python.org/pypi/ChineseDateTimeNLP)
 ![Python Version](https://img.shields.io/badge/python-3.7+-blue.svg)
 
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://pypi.org/project/isort/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 
-[![Downloads](https://pepy.tech/badge/chinesetimenlp)](https://pepy.tech/project/chinesetimenlp)
-[![Downloads](https://pepy.tech/badge/chinesetimenlp/week)](https://pepy.tech/project/chinesetimenlp)
+[![Downloads](https://pepy.tech/badge/chinesedatetimenlp)](https://pepy.tech/project/chinesedatetimenlp)
+[![Downloads](https://pepy.tech/badge/chinesedatetimenlp/week)](https://pepy.tech/project/chinesedatetimenlp)
 
 ## 简介
 
 这是 Time-NLP 的 Python3 版本。  
-fork 自 [zhanzecheng/Time_NLP](https://github.com/zhanzecheng/Time_NLP)  
+fork 自 [Kelab/ChineseTimeNLP](https://github.com/Kelab/ChineseTimeNLP)  
 
 相关链接：
 
@@ -24,7 +24,7 @@ fork 自 [zhanzecheng/Time_NLP](https://github.com/zhanzecheng/Time_NLP)
 
 ## 配置
 
-可以传入自定义的 pattern，默认 pattern 也可以通过 `from ChineseTimeNLP import pattern` 导入。
+可以传入自定义的 pattern，默认 pattern 也可以通过 `from ChineseDateTimeNLP import pattern` 导入。
 
 ```py
 TimeNormalizer(isPreferFuture=True, pattern=None):
@@ -37,13 +37,13 @@ TimeNormalizer(isPreferFuture=True, pattern=None):
 安装：
 
 ```bash
-pip install ChineseTimeNLP
+pip install ChineseDateTimeNLP
 ```
 
 使用:
 
 ```py
-from ChineseTimeNLP import TimeNormalizer
+from ChineseDateTimeNLP        import TimeNormalizer
 tn = TimeNormalizer()
 res = tn.parse(target=u"三天后")  # target 为待分析语句，baseTime 为基准时间默认是当前时间
 print(res)
@@ -179,13 +179,5 @@ temp []
 
 ## 声明
 
-为了适合自己的编程习惯，删除了代码中部分文件的头部注释信息，信息格式如下，特此声明：
-
-```python
-# -*- coding: utf-8 -*-
-# @Time    : xxxxxxxx
-# @Author  : zhm
-# @File    : xxxxx
-# @Software: PyCharm
-# @Changed : tianyuningmou
-```
+1. 增加了"礼拜xx"的识别
+2. 修复了"2023/10/09"识别失败的问题

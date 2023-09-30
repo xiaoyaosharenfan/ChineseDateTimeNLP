@@ -158,28 +158,48 @@ class TimeUnit:
         """
         月-日 兼容模糊写法：该方法识别时间表达式单元的月、日字段
         """
-        rule = r"((10)|(11)|(12)|(0?[1-9]))(月|\.|-|/)([0-3][0-9]|[1-9])"
+        rule = r"((10)|(11)|(12)|(0?[1-9]))(月|\.|-|/)?((30)|(31)|([1-2][0-9])|(0?[1-9]))"
         pattern: Pattern = re.compile(rule)
         match = pattern.search(self.exp_time)
         if match is not None:
             matchStr = match.group()
             p = re.compile(r"(月|\.|-|/)")
             m = p.search(matchStr)
-            if m is not None:
+            # 月和日中间没有分隔符的情况
+            if not m:
+                # 099或1210这样的格式
+                if matchStr.startswith("0") or len(matchStr) == 4:
+                    month = int(matchStr[:2])
+                    day = int(matchStr[2:])
+                # 210或99或110、120、130或131这样的格式
+                elif not matchStr.startswith("1") or len(matchStr) == 2 or matchStr.endswith("0") or matchStr.endswith("31"):
+                    month = int(matchStr[:1])
+                    day = int(matchStr[1:])
+                # 101、111、121这样有歧义的格式
+                else:
+                    # 倾向于当月与未来
+                    if self.normalizer.baseTime.month != 1 and int(matchStr[:2]) >= self.normalizer.baseTime.month:
+                        month = int(matchStr[:2])
+                        day = int(matchStr[2:])
+                    else:
+                        month = int(matchStr[:1])
+                        day = int(matchStr[1:])
+            # 月和日中间有分隔符的情况
+            else:
                 splitIndex = m.start()
                 month = matchStr[0:splitIndex]
                 day = matchStr[splitIndex + 1 :]
-                self.tp.month = int(month)
-                self.tp.day = int(day)
-                # 处理倾向于未来时间的情况
-                self.preferFuture(1)
+            self.tp.month = int(month)
+            self.tp.day = int(day)
+            # 处理倾向于未来时间的情况
+            self.preferFuture(1)
             self._check_time(self.tp.tunit)
 
     def norm_setday(self):
         """
         日-规范化方法：该方法识别时间表达式单元的日字段
         """
-        rule = r"((?<!\d))([0-3][0-9]|[1-9])(?=(日|号))"
+        rule = r"((?<!\d))((30)|(31)|([1-2][0-9])|(0?[1-9]))(?=(日|号))"
         pattern: Pattern = re.compile(rule)
         match = pattern.search(self.exp_time)
         if match is not None:
@@ -188,7 +208,7 @@ class TimeUnit:
             self.preferFuture(2)
             self._check_time(self.tp.tunit)
 
-        rule = r"((?<!\d))([0-3][0-9]|[1-9])(?=(日|天)后)"
+        rule = r"((?<!\d))((30)|(31)|([1-2][0-9])|(0?[1-9]))(?=(日|天)后)"
         pattern: Pattern = re.compile(rule)
         match = pattern.search(self.exp_time)
         if match is not None:
@@ -465,7 +485,7 @@ class TimeUnit:
                     self.isAllDayTime = False
         
         # 这里是对年份表达的极好方式
-        rule = r"[0-9]?[0-9]?[0-9]{2}(\.|-|/)((10)|(11)|(12)|(0?[1-9]))(\.|-|/)((?<!\d))([0-3][0-9]|[1-9])"
+        rule = r"[0-9]?[0-9]?[0-9]{2}(\.|-|/)((10)|(11)|(12)|(0?[1-9]))(\.|-|/)((?<!\d))((30)|(31)|([1-2][0-9])|(0?[1-9]))"
         pattern: Pattern = re.compile(rule)
         match = pattern.search(self.exp_time)
         if match is not None:
@@ -482,7 +502,7 @@ class TimeUnit:
             return
 
         rule = (
-            r"((10)|(11)|(12)|(0?[1-9]))(\.|-|/)((?<!\d))([0-3][0-9]|[1-9])(\.|-|/)[0-9]?[0-9]?[0-9]{2}"
+            r"((10)|(11)|(12)|(0?[1-9]))(\.|-|/)((?<!\d))((30)|(31)|([1-2][0-9])|(0?[1-9]))(\.|-|/)[0-9]?[0-9]?[0-9]{2}"
         )
         pattern: Pattern = re.compile(rule)
         match = pattern.search(self.exp_time)

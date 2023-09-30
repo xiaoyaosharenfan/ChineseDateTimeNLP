@@ -1091,12 +1091,12 @@ class TimeUnit:
         :param parse: 解析出来的list
         """
         time_arr = arrow2tp(self.normalizer.baseTime)
-        if self._noyear:
+        if self._noyear and parse[0] != -1:
             # check the month
             logger.debug(parse)
             logger.debug(time_arr)
             if parse[1] == int(time_arr[1]):
-                if parse[2] > int(time_arr[2]):
+                if parse[2] >= int(time_arr[2]):
                     parse[0] = parse[0] - 1
             self._noyear = False
 

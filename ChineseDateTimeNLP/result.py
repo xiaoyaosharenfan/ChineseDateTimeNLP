@@ -1,5 +1,5 @@
-from typing import TYPE_CHECKING, List, Literal, Tuple, TypedDict
-
+from typing import TYPE_CHECKING, List, Tuple
+from typing_extensions import Literal, TypedDict
 from loguru import logger
 
 if TYPE_CHECKING:
